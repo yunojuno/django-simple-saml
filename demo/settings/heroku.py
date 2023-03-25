@@ -5,6 +5,8 @@ from .base import *
 
 DATABASES["default"] = dj_database_url.config()
 
+STATIC_ROOT = path.join(PROJECT_DIR, "staticfiles")
+
 # generate with OpenSSL and store in environment variable
 SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = getenv("SAML_PUBLIC_CERT")
 
