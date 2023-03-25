@@ -1,11 +1,11 @@
-from os import path
+from os import getenv, path
 
 DEBUG = True
 TEMPLATE_DEBUG = True
 USE_TZ = True
 USE_L10N = True
 
-DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": "demo.db"}}
+DATABASES = {}
 
 INSTALLED_APPS = (
     "django.contrib.admin",
@@ -26,7 +26,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
-PROJECT_DIR = path.abspath(path.join(path.dirname(__file__)))
+# we must come up one directory as we are in demo/settings
+PROJECT_DIR = path.abspath(path.join(path.dirname(__file__), ".."))
 
 TEMPLATES = [
     {
@@ -130,13 +131,12 @@ SOCIAL_AUTH_SAML_SUPPORT_CONTACT = {
 # support. The SSO URL must support the HTTP-Redirect binding. You can
 # get these values from the provider’s XML metadata.
 SOCIAL_AUTH_SAML_ENABLED_IDPS = {
-    # "testshib": {
-    #     "entity_id": "https://idp.testshib.org/idp/shibboleth",
-    #     "url": "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO",
-    #     "x509cert": "MIIEDjCCAvagAwIBAgIBADA ... 8Bbnl+ev0peYzxFyF5sQA==",
-    # }
+    "test_idp": {
+        "entity_id": getenv("SAML_ENTITY_ID"),
+        "url": getenv("SAML_SSO_URL"),
+        "x509cert": getenv("SAML_X509_CERT"),
+    }
 }
-
 
 # === SOCIAL_AUTH_APP_DJANGO SETTINGS ===
 # When using PostgreSQL, it’s recommended to use the built-in JSONB

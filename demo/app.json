@@ -1,0 +1,46 @@
+{
+    "name": "Django SAML Demo",
+    "description": "Demo app for SAML authentication with Django",
+    "scripts": {
+        "postdeploy": "python manage.py migrate"
+    },
+    "env": {
+        "DJANGO_SETTINGS_MODULE": {
+            "description": "Location of the settings (fixed)",
+            "value": "demo.settings.heroku",
+            "required": true
+        },
+        "DJANGO_SECRET_KEY": {
+            "description": "Used as the Django secret key.",
+            "generator": "secret"
+        },
+        "WEB_CONCURRENCY": {
+            "description": "The number of processes to run.",
+            "value": "1"
+        },
+        "SAML_ENTITY_ID": {
+            "description": "The entity ID of the service provider.",
+            "required": true
+        },
+        "SAML_SSO_URL": {
+            "description": "The SSO URL of the identity provider.",
+            "required": true
+        },
+        "SAML_X509_CERT": {
+            "description": "The X.509 certificate of the identity provider.",
+            "required": true
+        }
+    },
+    "formation": {
+        "web": {
+            "quantity": 1,
+            "size": "standard-1x"
+        }
+    },
+    "addons": [
+        {
+            "plan": "heroku-postgresql:hobby-dev",
+            "as": "DATABASE"
+        }
+    ]
+}

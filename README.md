@@ -1,89 +1,43 @@
-# Poetry Template
+# Django Heroku Github Sync
 
-Django app template, using `poetry-python` as dependency manager.
+Django app to demonstrate SAML authentication using Python Social Auth.
 
-This project is a template that can be cloned and re-used for
-redistributable apps.
+## Version support
 
-It includes the following:
+This app support Django 4.1+ and Python 3.11+.
 
-* `poetry` for dependency management
-* `isort`, `black`, `pyupgrade` and `flake8` linting
-* `pre-commit` to run linting
-* `mypy` for type checking
-* `tox` and Github Actions for builds and CI
+## Background
 
-There are default config files for the linting and mypy.
+Implementing and testing SAML requires an accessible URL - this project is
+designed to show an app running on Heroku that can authenticate a user
+against a known Identity Provider (IdP).
 
-## Principles
+This is a Django app that uses `social-auth-app-django` and
+`python3-saml` to demonstrate the end to end flow.
 
-The motivation for this project is to provide a consistent set of
-standards across all YunoJuno public Python/Django projects. The
-principles we want to encourage are:
+It is designed to be deployed to Heroku, although you could test locally
+with ngrok. You just need a (HTTPS) URL that the IdP can connect to.
 
-* Simple for developers to get up-and-running
-* Consistent style (`black`, `isort`, `flake8`)
-* Future-proof (`pyupgrade`)
-* Full type hinting (`mypy`)
+## Configuration
 
-## Versioning
+Click this button to deploy to Heroku:
 
-We currently support Python 3.7+, and Django 3.2+. We will aggressively
-upgrade Django versions, and we won't introduce hacks to support
-breaking changes - if Django 4 introduces something that 2.2 doesn't
-support we'll drop it.
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-## Tests
+You must supply three SAML settings that should be available from your test
+IdP provider. If you have a Google Workspace account, that can be used - see
+https://admin.google.com/ac/security/ssocert for details.
 
-#### Tests package
+## Miscellaneous (tests, etc.)
 
-The package tests themselves are _outside_ of the main library code, in
-a package that is itself a Django app (it contains `models`, `settings`,
-and any other artifacts required to run the tests (e.g. `urls`).) Where
-appropriate, this test app may be runnable as a Django project - so that
-developers can spin up the test app and see what admin screens look
-like, test migrations, etc.
+This app is designed to be deployed, not downloaded as a package - it's not on
+PyPI, it has no tests, or CI build.
 
-#### Running tests
+## DISCLAIMER
 
-The tests themselves use `pytest` as the test runner. If you have
-installed the `poetry` evironment, you can run them thus:
+This app demonstrate SSO using SAML2.0, which means it's _destined_ (but not
+designed) to be used in security-conscious enterprise environments. It is a
+**demonstration** only - it should NOT BE TRUSTED, and you do so at YOUR OWN
+RISK.
 
-```
-$ poetry run pytest
-```
-
-or
-
-```
-$ poetry shell
-(my_app) $ pytest
-```
-
-The full suite is controlled by `tox`, which contains a set of
-environments that will format, lint, and test against all
-support Python + Django version combinations.
-
-```
-$ tox
-...
-______________________ summary __________________________
-  fmt: commands succeeded
-  lint: commands succeeded
-  mypy: commands succeeded
-  py37-django22: commands succeeded
-  py37-django32: commands succeeded
-  py37-djangomain: commands succeeded
-  py38-django22: commands succeeded
-  py38-django32: commands succeeded
-  py38-djangomain: commands succeeded
-  py39-django22: commands succeeded
-  py39-django32: commands succeeded
-  py39-djangomain: commands succeeded
-```
-
-#### CI
-
-There is a `.github/workflows/tox.yml` file that can be used as a
-baseline to run all of the tests on Github. This file runs the oldest
-(2.2), newest (3.2), and head of the main Django branch.
+**Do not deploy this in a secure environment, and do not connect it to a real IdP.**
