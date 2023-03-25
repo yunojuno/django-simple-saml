@@ -4,6 +4,14 @@
     "scripts": {
         "postdeploy": "python manage.py migrate"
     },
+    "buildpacks": [
+        {
+            "url": "https://buildpack-registry.s3.amazonaws.com/buildpacks/heroku-community/apt.tgz"
+        },
+        {
+            "url": "heroku/python"
+        }
+    ],
     "env": {
         "DJANGO_SETTINGS_MODULE": {
             "description": "Location of the settings (fixed)",
