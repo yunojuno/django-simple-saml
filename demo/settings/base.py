@@ -89,15 +89,13 @@ SOCIAL_AUTH_SAML_SP_ENTITY_ID = "https://localhost:8000/saml2/acs/"
 # The X.509 certificate string for the key pair that your app will use.
 # You can generate a new self-signed key pair with:
 # openssl req -new -x509 -days 3652 -nodes -out saml.crt -keyout saml.key
-with open("saml.crt") as f:
-    SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = f.read()
+SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = "GENERATE THIS WITH OPENSSL"
 
 
 # The private key to be used by your app. If you used the example
 # openssl command given above, set this to the contents of saml.key
 # (again, you can omit the first and last lines).
-with open("saml.key") as f:
-    SOCIAL_AUTH_SAML_SP_PRIVATE_KEY = f.read()
+SOCIAL_AUTH_SAML_SP_PRIVATE_KEY = "GENERATE THIS WITH OPENSSL"
 
 
 # A dictionary that contains information about your app. You must

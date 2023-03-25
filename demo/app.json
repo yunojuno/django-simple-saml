@@ -26,6 +26,12 @@
             "description": "The number of processes to run.",
             "value": "1"
         },
+        "SAML_PUBLIC_CERT":{
+            "description": "The public certificate of the service provider."
+        },
+        "SAML_PRIVATE_KEY":{
+            "description": "The private key of the service provider."
+        },
         "SAML_ENTITY_ID": {
             "description": "The entity ID of the service provider.",
             "required": true
