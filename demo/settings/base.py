@@ -46,7 +46,7 @@ TEMPLATES = [
 
 STATIC_URL = "/static/"
 
-SECRET_KEY = "secret"  # noqa: S105
+SECRET_KEY = getenv("DJANGO_SECRET_KEY")
 
 LOGGING = {
     "version": 1,
