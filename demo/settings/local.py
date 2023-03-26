@@ -1,5 +1,7 @@
 from .base import *  # noqa: F403
 
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".ngrok.io"]
+
 DATABASES["default"] = {"ENGINE": "django.db.backends.sqlite3", "NAME": "demo.db"}
 
 if not SOCIAL_AUTH_SAML_SP_PUBLIC_CERT:
