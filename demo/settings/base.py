@@ -14,7 +14,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "social_django",
-    "demo",
+    "simple_saml",
 )
 
 MIDDLEWARE = [
@@ -78,8 +78,7 @@ LOGGING = {
 ROOT_URLCONF = "demo.urls"
 
 AUTHENTICATION_BACKENDS = (
-    # "social_core.backends.saml.SAMLAuth",
-    "demo.saml.SAMLAuth",
+    "simple_saml.backends.SimpleSAMLAuth",
     "django.contrib.auth.backends.ModelBackend",
 )
 

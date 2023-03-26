@@ -9,8 +9,8 @@
         <ol>
             {% for idp in identity_providers %}
             <li>
-                <a href="{% url 'social:begin' 'saml' %}?next={{ request.path }}&idp={{ idp.name }}"
-                    >{{ idp.name }}</a
+                <a href="{% url 'social:begin' 'saml' %}?next={{ request.path }}&idp={{ idp.label }}"
+                    >{{ idp.label }}</a
                 >
             </li>
             {% endfor %}
