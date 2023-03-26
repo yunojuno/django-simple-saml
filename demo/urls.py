@@ -9,6 +9,7 @@ urlpatterns = [
     # path("", debug.default_urlconf),
     path("", index),
     path("admin/", admin.site.urls),
-    path("social", include("social_django.urls", namespace="social")),
+    path("accounts/", include("django.contrib.auth.urls")),
+    path("social/", include("social_django.urls", namespace="social")),
     path("saml/", saml_metadata_view, name="saml_metadata"),
 ]

@@ -2,6 +2,10 @@
     <head></head>
     <body>
         <h1>Index</h1>
-        <p>Click <a href="{{ test_idp }}">here</a> to login with the test IdP.</p>
+        {% if request.user.is_authenticated %}Hello, {{ request.user.first_name }}
+        <p><a href="{% url 'logout' %}?next=/">Logout</a></p>
+        {% else %}
+        <p>Click <a href="{% url 'social:begin' 'saml' %}?next={{ request.path }}&idp=test_idp">here</a> to authenticate with the test IdP.</p>
+        {% endif %}
     </body>
 </html>

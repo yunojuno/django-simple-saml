@@ -11,3 +11,7 @@ if not SOCIAL_AUTH_SAML_SP_PUBLIC_CERT:
 if not SOCIAL_AUTH_SAML_SP_PRIVATE_KEY:
     with open("saml.key") as f:
         SOCIAL_AUTH_SAML_SP_PRIVATE_KEY = f.read()
+
+
+# Ensures that the request is secure when running behind a proxy
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

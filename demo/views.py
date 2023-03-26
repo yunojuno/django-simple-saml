@@ -1,5 +1,3 @@
-from urllib.parse import urlencode
-
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -7,10 +5,7 @@ from social_django.utils import load_backend, load_strategy
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    base_url = reverse("social:begin", kwargs={"backend": "saml"})
-    params = urlencode({"next": "/", "idp": "test_idp"})
-    context = {"test_idp": f"{base_url}?{params}"}
-    return render(request, "index.html", context)
+    return render(request, "index.html")
 
 
 def saml_metadata_view(request: HttpRequest) -> HttpResponse:
