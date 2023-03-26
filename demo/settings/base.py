@@ -87,13 +87,13 @@ LOGIN_REDIRECT_URL = "/"
 #
 # The SAML Entity ID for your app. This should be a URL that includes a
 # domain name you own. It doesn’t matter what the URL points to.
-SOCIAL_AUTH_SAML_SP_ENTITY_ID = "https://4eb6-5-80-28-139.eu.ngrok.io"
+SOCIAL_AUTH_SAML_SP_ENTITY_ID = getenv("SAML_SP_ENTITY_ID", "https://localhost")
 
 # The X.509 certificate string for the key pair that your app will use.
 # You can generate a new self-signed key pair with:
 # openssl req -new -x509 -days 3652 -nodes -out saml.crt -keyout saml.key
 SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = getenv(
-    "SAML_PUBLIC_CERT", "GENERATE THIS WITH OPENSSL"
+    "SAML_SP_PUBLIC_CERT", "GENERATE THIS WITH OPENSSL"
 )
 
 
@@ -101,7 +101,7 @@ SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = getenv(
 # openssl command given above, set this to the contents of saml.key
 # (again, you can omit the first and last lines).
 SOCIAL_AUTH_SAML_SP_PRIVATE_KEY = getenv(
-    "SAML_PRIVATE_KEY", "GENERATE THIS WITH OPENSSL"
+    "SAML_SP_PRIVATE_KEY", "GENERATE THIS WITH OPENSSL"
 )
 
 
@@ -137,13 +137,14 @@ SOCIAL_AUTH_SAML_SUPPORT_CONTACT = {
 # get these values from the provider’s XML metadata.
 SOCIAL_AUTH_SAML_ENABLED_IDPS = {
     "test_idp": {
-        "entity_id": getenv("SAML_ENTITY_ID"),
-        "url": getenv("SAML_SSO_URL"),
-        "x509cert": getenv("SAML_X509_CERT"),
-        "attr_user_permanent_id": "name_id",
+        "entity_id": getenv("SAML_IDP_ENTITY_ID"),
+        "url": getenv("SAML_IDP_SSO_URL"),
+        "x509cert": getenv("SAML_IDP_X509_CERT"),
         "attr_first_name": "first_name",
         "attr_last_name": "last_name",
         "attr_email": "email",
+        # map email a second time as the unique identifier
+        "attr_user_permanent_id": "email",
     }
 }
 
