@@ -4,8 +4,20 @@
         <h1>Index</h1>
         {% if request.user.is_authenticated %}Hello, {{ request.user.first_name }}
         <p><a href="{% url 'logout' %}?next=/">Logout</a></p>
+        {% elif identity_providers %} The list below is the list of IdentityProviders that are
+        configured for this site. Click on the link to authenticate with the IdP.
+        <ol>
+            {% for idp in identity_providers %}
+            <li>
+                <a href="{% url 'social:begin' 'saml' %}?next={{ request.path }}&idp={{ idp.name }}"
+                    >{{ idp.name }}</a
+                >
+            </li>
+            {% endfor %}
+        </ol>
         {% else %}
-        <p>Click <a href="{% url 'social:begin' 'saml' %}?next={{ request.path }}&idp=test_idp">here</a> to authenticate with the test IdP.</p>
+        <p>There are no IdentityProviders set up.</p>
         {% endif %}
+        <p>Click <a href="/admin/">here</a> to log in to the admin site.</p>
     </body>
 </html>

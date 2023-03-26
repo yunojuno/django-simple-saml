@@ -14,6 +14,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "social_django",
+    "demo",
 )
 
 MIDDLEWARE = [
@@ -77,7 +78,8 @@ LOGGING = {
 ROOT_URLCONF = "demo.urls"
 
 AUTHENTICATION_BACKENDS = (
-    "social_core.backends.saml.SAMLAuth",
+    # "social_core.backends.saml.SAMLAuth",
+    "demo.saml.SAMLAuth",
     "django.contrib.auth.backends.ModelBackend",
 )
 
@@ -131,24 +133,17 @@ SOCIAL_AUTH_SAML_SUPPORT_CONTACT = {
     "emailAddress": "hello@yunojuno.com",
 }
 
+
+# THIS IS NOW READ FROM THE DATABASE - SEE saml.py
 # The most important setting. List the Entity ID, SSO URL, and x.509
 # public key certificate for each provider that your app wants to
 # support. The SSO URL must support the HTTP-Redirect binding. You can
 # get these values from the provider’s XML metadata.
-SOCIAL_AUTH_SAML_ENABLED_IDPS = {
-    "test_idp": {
-        "entity_id": getenv("SAML_IDP_ENTITY_ID"),
-        "url": getenv("SAML_IDP_SSO_URL"),
-        "x509cert": getenv("SAML_IDP_X509_CERT"),
-        "attr_first_name": "first_name",
-        "attr_last_name": "last_name",
-        "attr_email": "email",
-        # map email a second time as the unique identifier
-        "attr_user_permanent_id": "email",
-    }
-}
+# SOCIAL_AUTH_SAML_ENABLED_IDPS = {}
+
 
 # === SOCIAL_AUTH_APP_DJANGO SETTINGS ===
+
 # When using PostgreSQL, it’s recommended to use the built-in JSONB
 # field to store the extracted extra_data.
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
