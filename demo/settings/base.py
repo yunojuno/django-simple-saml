@@ -137,6 +137,7 @@ SOCIAL_AUTH_SAML_ENABLED_IDPS = {
         "entity_id": getenv("SAML_ENTITY_ID"),
         "url": getenv("SAML_SSO_URL"),
         "x509cert": getenv("SAML_X509_CERT"),
+        "attr_user_permanent_id": "name_id",
     }
 }
 
