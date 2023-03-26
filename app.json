@@ -26,21 +26,25 @@
             "description": "The number of processes to run.",
             "value": "1"
         },
-        "SAML_PUBLIC_CERT":{
+        "SAML_SP_PUBLIC_CERT":{
             "description": "The public certificate of the service provider."
         },
-        "SAML_PRIVATE_KEY":{
+        "SAML_SP_PRIVATE_KEY":{
             "description": "The private key of the service provider."
         },
-        "SAML_ENTITY_ID": {
+        "SAML_SP_ENTITY_ID": {
             "description": "The entity ID of the service provider.",
             "required": true
         },
-        "SAML_SSO_URL": {
+        "SAML_IDP_ENTITY_ID": {
+            "description": "The entity ID of the identity provider.",
+            "required": true
+        },
+        "SAML_IDP_SSO_URL": {
             "description": "The SSO URL of the identity provider.",
             "required": true
         },
-        "SAML_X509_CERT": {
+        "SAML_IDP_X509_CERT": {
             "description": "The X.509 certificate of the identity provider.",
             "required": true
         }
