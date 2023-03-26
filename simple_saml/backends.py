@@ -1,7 +1,11 @@
+import logging
+
 from social_core.backends.saml import SAMLAuth as BaseSAMLAuth
 from social_core.backends.saml import SAMLIdentityProvider
 
 from .models import IdentityProvider
+
+logger = logging.getLogger(__name__)
 
 
 class SimpleSAMLAuth(BaseSAMLAuth):
@@ -10,3 +14,15 @@ class SimpleSAMLAuth(BaseSAMLAuth):
     def get_idp(self, idp_name: str) -> SAMLIdentityProvider:
         idp = IdentityProvider.objects.get(label=idp_name)
         return SAMLIdentityProvider(idp_name, **idp.config)
+
+    def get_user_permanent_id(self, details: dict, response: dict) -> str:
+        """Return the permanent user id from the response."""
+        try:
+            return super().get_user_permanent_id(details, response)
+        except KeyError:
+            logger.exception(
+                "Error getting user_permanent_id from response. "
+                "Check response for more details: %s",
+                response,
+            )
+            raise

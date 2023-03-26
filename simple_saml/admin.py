@@ -2,6 +2,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.http import HttpRequest
+from django.urls import reverse
 
 from .models import IdentityProvider
 
@@ -19,11 +20,20 @@ class IdentityProviderForm(forms.ModelForm):
 @admin.register(IdentityProvider)
 class IdentityProviderAdmin(admin.ModelAdmin):
     form = IdentityProviderForm
-    readonly_fields = ("created_at", "updated_at", "sp_entity_id")
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "sp_entity_id",
+        "sp_acs_url",
+        "sp_relay_state",
+    )
     list_display = ("label", "entity_id", "created_at", "updated_at", "is_enabled")
     fieldsets = (
         (None, {"fields": ("label", "is_enabled")}),
-        ("Settings metadata (reference only)", {"fields": ("sp_entity_id",)}),
+        (
+            "Information provided to Identity Provider",
+            {"fields": ("sp_entity_id", "sp_acs_url", "sp_relay_state")},
+        ),
         (
             "Information provided by Identity Provider (IdP)",
             {
@@ -33,9 +43,18 @@ class IdentityProviderAdmin(admin.ModelAdmin):
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     )
 
-    @admin.display(description="Service Provider Entity ID")
+    @admin.display(description="Entity ID")
     def sp_entity_id(self, _: IdentityProvider) -> str:
         return getattr(settings, "SOCIAL_AUTH_SAML_SP_ENTITY_ID", "missing")
+
+    @admin.display(description="Assertion Consumer Service (ACS) URL")
+    def sp_acs_url(self, _: IdentityProvider) -> str:
+        url = reverse("social:complete", args=("saml",))
+        return f"https://<insert-external-domain>{url}"
+
+    @admin.display(description="Relay State")
+    def sp_relay_state(self, obj: IdentityProvider) -> str:
+        return obj.label
 
     def save_model(
         self,
@@ -47,4 +66,8 @@ class IdentityProviderAdmin(admin.ModelAdmin):
         """Validate that the metadata contains attr_user_permanent_id."""
         if "attr_user_permanent_id" not in obj.metadata:
             raise forms.ValidationError("`attr_user_permanent_id` is a required key.")
+        if ":" in obj.label:
+            raise forms.ValidationError("`label` must not contain a colon.")
+        if " " in obj.label:
+            raise forms.ValidationError("`label` must not contain a space.")
         return super().save_model(request, obj, form, change)
