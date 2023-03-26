@@ -1,9 +1,8 @@
 from os import getenv, path
 
-DEBUG = True
-TEMPLATE_DEBUG = True
+DEBUG = bool(getenv("DJANGO_DEBUG", False))
+TEMPLATE_DEBUG = DEBUG
 USE_TZ = True
-USE_L10N = True
 
 DATABASES = {}
 
@@ -19,6 +18,8 @@ INSTALLED_APPS = (
 
 MIDDLEWARE = [
     # default django middleware
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -45,8 +46,12 @@ TEMPLATES = [
 ]
 
 STATIC_URL = "/static/"
+STATIC_ROOT = path.join(PROJECT_DIR, "staticfiles")
 
 SECRET_KEY = getenv("DJANGO_SECRET_KEY")
+
+# Ensures that the request is secure when running behind a proxy
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 LOGGING = {
     "version": 1,
@@ -71,15 +76,10 @@ LOGGING = {
 
 ROOT_URLCONF = "demo.urls"
 
-
 AUTHENTICATION_BACKENDS = (
     "social_core.backends.saml.SAMLAuth",
     "django.contrib.auth.backends.ModelBackend",
 )
-
-if not DEBUG:
-    raise Exception("This settings file can only be used with DEBUG=True")
-
 
 LOGIN_REDIRECT_URL = "/"
 

@@ -6,5 +6,3 @@ from .base import *
 ALLOWED_HOSTS = [".herokuapp.com"]
 
 DATABASES["default"] = dj_database_url.config()
-
-STATIC_ROOT = path.join(PROJECT_DIR, "staticfiles")

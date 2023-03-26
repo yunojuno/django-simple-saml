@@ -24,11 +24,12 @@ packages = [{ include = "demo" }]
 [tool.poetry.dependencies]
 python = "^3.11"
 django = "^4.1"
-social-auth-app-django = "^5.1.0"
+social-auth-app-django = "*"
 python3-saml = "*"
 dj_database_url = { version = "*", optional=true}
 psycopg2-binary = { version = "*", optional=true}
 gunicorn = { version = "*", optional=true}
+whitenoise = "*"
 
 [tool.poetry.dev-dependencies]
 black = "*"
