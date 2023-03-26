@@ -12,7 +12,13 @@ class SimpleSAMLAuth(BaseSAMLAuth):
     """Subclass of SAMLAuth that stores the IdP info in a model."""
 
     def get_idp(self, idp_name: str) -> SAMLIdentityProvider:
-        idp = IdentityProvider.objects.get(label=idp_name)
+        try:
+            idp = IdentityProvider.objects.get(label=idp_name)
+        except IdentityProvider.DoesNotExist:
+            raise ValueError(f"Identity provider {idp_name} does not exist.")
+        if not idp.is_enabled:
+            # TODO: is this a security issue? Should we return a 404 instead?
+            raise ValueError(f"Identity provider {idp_name} is not enabled.")
         return SAMLIdentityProvider(idp_name, **idp.config)
 
     def get_user_permanent_id(self, details: dict, response: dict) -> str:

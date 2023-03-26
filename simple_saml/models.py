@@ -39,12 +39,46 @@ class IdentityProvider(models.Model):
         help_text=_lazy("The X.509 certificate provided by the IdP."),
         verbose_name="X509 Certificate",
     )
-    metadata = models.JSONField(
-        default=dict,
-        blank=True,
+    # these user attributes are used to map user details required to
+    # complete account creation, the model values determine the
+    # attribute names used to map the user details.
+    user_permanent_id_attr = models.CharField(
+        max_length=255,
         help_text=_lazy(
-            "Configuration keys to avoid having to use uniform resource name's as "
-            "attributes to map user details required to complete account creation."
+            "The attribute provided by the IdP for the user's unique "
+            "ID property (required)."
+        ),
+    )
+    first_name_attr = models.CharField(
+        blank=True,
+        max_length=255,
+        help_text=_lazy(
+            "The name of the attribute provided by the IdP for the "
+            "'user.first_name' property."
+        ),
+    )
+    last_name_attr = models.CharField(
+        blank=True,
+        max_length=255,
+        help_text=_lazy(
+            "The name of the attribute provided by the IdP for "
+            "'user.last_name' property"
+        ),
+    )
+    email_attr = models.CharField(
+        blank=True,
+        max_length=255,
+        help_text=_lazy(
+            "The name of the attribute provided by the IdP for the "
+            "'user.email' property."
+        ),
+    )
+    username_attr = models.CharField(
+        blank=True,
+        max_length=255,
+        help_text=_lazy(
+            "The username attribute provided by the IdP for the "
+            "'user.username' property."
         ),
     )
     is_enabled = models.BooleanField(default=True)
@@ -62,10 +96,26 @@ class IdentityProvider(models.Model):
         return super().save(*args, **kwargs)
 
     @property
+    def user_attribute_map(self) -> dict[str, str]:
+        # only return non-empty values, as social_auth does not handle
+        # empty values well.
+        return {
+            k: v
+            for k, v in {
+                "attr_user_permanent_id": self.user_permanent_id_attr,
+                "attr_first_name": self.first_name_attr,
+                "attr_last_name": self.last_name_attr,
+                "attr_username": self.username_attr,
+                "attr_email": self.email_attr,
+            }.items()
+            if v
+        }
+
+    @property
     def config(self) -> dict[str, str]:
         # returns the config for the get_idp method
         return {
             "entity_id": self.entity_id,
             "url": self.sso_url,
             "x509cert": self.x509_cert,
-        } | self.metadata
+        } | self.user_attribute_map

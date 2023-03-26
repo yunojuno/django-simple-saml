@@ -27,7 +27,7 @@ class IdentityProviderAdmin(admin.ModelAdmin):
         "sp_acs_url",
         "sp_relay_state",
     )
-    list_display = ("label", "entity_id", "created_at", "updated_at", "is_enabled")
+    list_display = ("label", "entity_id", "created_at", "is_enabled")
     fieldsets = (
         (None, {"fields": ("label", "is_enabled")}),
         (
@@ -35,9 +35,25 @@ class IdentityProviderAdmin(admin.ModelAdmin):
             {"fields": ("sp_entity_id", "sp_acs_url", "sp_relay_state")},
         ),
         (
-            "Information provided by Identity Provider (IdP)",
+            "Information provided by Identity Provider (required)",
             {
-                "fields": ("entity_id", "sso_url", "x509_cert", "metadata"),
+                "fields": (
+                    "entity_id",
+                    "sso_url",
+                    "x509_cert",
+                ),
+            },
+        ),
+        (
+            "Field mapping from IdP attributes to User Model",
+            {
+                "fields": (
+                    "user_permanent_id_attr",
+                    "first_name_attr",
+                    "last_name_attr",
+                    "email_attr",
+                    "username_attr",
+                ),
             },
         ),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
@@ -64,8 +80,8 @@ class IdentityProviderAdmin(admin.ModelAdmin):
         change: bool,
     ) -> None:
         """Validate that the metadata contains attr_user_permanent_id."""
-        if "attr_user_permanent_id" not in obj.metadata:
-            raise forms.ValidationError("`attr_user_permanent_id` is a required key.")
+        # if "attr_user_permanent_id" not in obj.metadata:
+        #     raise forms.ValidationError("`attr_user_permanent_id` is a required key.")
         if ":" in obj.label:
             raise forms.ValidationError("`label` must not contain a colon.")
         if " " in obj.label:
