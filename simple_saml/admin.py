@@ -27,9 +27,9 @@ class IdentityProviderAdmin(admin.ModelAdmin):
         "sp_acs_url",
         "sp_relay_state",
     )
-    list_display = ("label", "entity_id", "created_at", "is_enabled")
+    list_display = ("label", "provider", "entity_id", "created_at", "is_enabled")
     fieldsets = (
-        (None, {"fields": ("label", "is_enabled")}),
+        (None, {"fields": ("label", "provider", "is_enabled")}),
         (
             "Information provided to Identity Provider",
             {"fields": ("sp_entity_id", "sp_acs_url", "sp_relay_state")},

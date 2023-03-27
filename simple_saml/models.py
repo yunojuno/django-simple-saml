@@ -25,6 +25,11 @@ class IdentityProvider(models.Model):
             "(Recommended value is the name or URL of the IdP.)"
         ),
     )
+    provider = models.CharField(
+        max_length=255,
+        help_text=_lazy("The name of the provider (e.g. Google Workspace, Okta)."),
+        blank=True,
+    )
     entity_id = models.CharField(
         max_length=255,
         help_text=_lazy("The entity ID provided by the IdP."),
@@ -88,6 +93,8 @@ class IdentityProvider(models.Model):
     objects = IdentityProviderManager()
 
     def __str__(self) -> str:
+        if self.provider:
+            return f"{self.label} ({self.provider})"
         return self.label
 
     def save(self, *args: Any, **kwargs: Any) -> IdentityProvider:
@@ -119,3 +126,9 @@ class IdentityProvider(models.Model):
             "url": self.sso_url,
             "x509cert": self.x509_cert,
         } | self.user_attribute_map
+
+    def x509_cert_short(self) -> str:
+        """Return truncated version of X.509 certificate."""
+        if not self.x509_cert:
+            return ""
+        return self.x509_cert[:20] + "..." + self.x509_cert[-20:]
