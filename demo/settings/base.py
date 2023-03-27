@@ -138,7 +138,8 @@ SOCIAL_AUTH_SAML_SUPPORT_CONTACT = {
 # public key certificate for each provider that your app wants to
 # support. The SSO URL must support the HTTP-Redirect binding. You can
 # get these values from the provider’s XML metadata.
-# SOCIAL_AUTH_SAML_ENABLED_IDPS = {}
+# Included to keep mypy happy - it's ignored by the code.
+SOCIAL_AUTH_SAML_ENABLED_IDPS = {}
 
 
 # === SOCIAL_AUTH_APP_DJANGO SETTINGS ===
