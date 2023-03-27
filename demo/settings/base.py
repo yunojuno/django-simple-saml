@@ -6,7 +6,7 @@ USE_TZ = True
 
 DATABASES = {}
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -15,7 +15,7 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "social_django",
     "simple_saml",
-)
+]
 
 MIDDLEWARE = [
     # default django middleware
