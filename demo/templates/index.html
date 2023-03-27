@@ -1,24 +1,68 @@
 <html>
-    <head></head>
+    <head>
+        <style>
+            body {
+                max-width: 640px;
+            }
+            details {
+                margin: 1em 0;
+            }
+        </style>
+    </head>
     <body>
-        <h1>Index</h1>
-        {% if request.user.is_authenticated %}Hello, {{ request.user.first_name }}
-        <p><a href="{% url 'logout' %}?next=/">Logout</a></p>
-        {% elif identity_providers %} The list below is the list of IdentityProviders that are
-        configured for this site. Click on the link to authenticate with the IdP.
-        <ol>
-            {% for idp in identity_providers %}
-            <li>
-                <a href="{% url 'social:begin' 'saml' %}?next={{ request.path }}&idp={{ idp.label }}"
-                    >{{ idp.label }}</a
+        <h1>SAML demonstration</h1>
+        {% if request.user.is_authenticated %}
+        <p>Congratulations, you are currently logged in as {{ request.user.get_full_name }}.</p>
+        {% elif identity_providers %}
+        <p>
+            The list below is the list of Identity Providers (IdP) that are configured for this demo
+            site. An IdP is an Identity Provider, which is the service that authenticates the user.
+            This could be a well-known public service like Google, or Microsoft, or it could be a
+            custom corporate service.
+        </p>
+        <p>
+            IdPs are used to implement Single Sign-On (SSO) for enterprise environments, providing
+            one-click access to multiple services.
+        </p>
+        <p>Click on the links below to log in using your relevant account.</p>
+        {% for idp in identity_providers %}
+        <details>
+            <summary>
+                <a
+                    href="{% url 'social:begin' 'saml' %}?next={{ request.path }}&idp={{ idp.label }}"
                 >
-            </li>
-            {% endfor %}
-        </ol>
+                    {{ idp }}</a
+                >
+            </summary>
+            <dl>
+                <dt>Entity ID</dt>
+                <dd>{{ idp.entity_id }}</dd>
+            </dl>
+            <dl>
+                <dt>SSO URL</dt>
+                <dd>{{ idp.sso_url }}</dd>
+            </dl>
+            <dl>
+                <dt>Public certificate</dt>
+                <dd>
+                    <pre>{{ idp.x509_cert_short }}</pre>
+                </dd>
+            </dl>
+        </details>
+        {% endfor %}
+        <p>
+            If you are already logged into the IdP service, you should just be logged straight into
+            this page. If you are not already logged in to the IdP service, you will be redirected
+            to the appropriate login page, and then redirected back.
+        </p>
         {% else %}
         <p>There are no IdentityProviders set up.</p>
         {% endif %}
-        <hr>
+        <hr />
+        {% if request.user.is_authenticated and not request.user.is_staff %}
+        <a href="{% url 'logout' %}?next=/">Log out</a>
+        {% else %}
         <p><a href="/admin/">Admin site</a></p>
+        {% endif %}
     </body>
 </html>
