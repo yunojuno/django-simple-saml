@@ -22,7 +22,7 @@ classifiers = [
 packages = [{ include = "demo" }]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 django = "^4.1"
 social-auth-app-django = "*"
 python3-saml = "*"

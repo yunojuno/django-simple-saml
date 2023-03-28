@@ -25,11 +25,7 @@
                 you want to test the SAML login.
             </p>
         {% elif request.user.is_authenticated %}
-            <p>Congratulations, you are currently logged in as {{
-                request.user.get_full_name }}.</p>
-            {% if auth %}
-                <p>Social Auth: {{ auth.uid }}</p>
-            {% endif %}
+            <p>Congratulations, you are currently logged in as <strong>{{ request.user.get_full_name }}</strong>.</p>
         {% else %}{# not logged in #}
             <p>
                 Below is the list of Identity Providers
