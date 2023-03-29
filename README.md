@@ -1,22 +1,38 @@
-# Django Heroku Github Sync
+# Django Simple SAML
 
-Django app to demonstrate SAML authentication using Python Social Auth.
+Django app to manage SAML Identity Providers
 
 ## Version support
 
-This app support Django 4.1+ and Python 3.11+.
+This app support Django 4.1+ and Python 3.8+.
 
 ## Background
 
-Implementing and testing SAML requires an accessible URL - this project is
-designed to show an app running on Heroku that can authenticate a user
-against a known Identity Provider (IdP).
+This library builds on top of `social-auth-app-django` and
+`python3-saml`, which together handle the heavy lifting of a SAML
+authentication flow. It assumes that you are building a service that
+will act as the Service Provider (SP) in the flow, and that you will be
+integrating with a number of external Identity Providers (IdP) for user
+authentication.
 
-This is a Django app that uses `social-auth-app-django` and
-`python3-saml` to demonstrate the end to end flow.
+The core change to those libraries that this package adds is a new
+`SAMLAuth` backend called `SimpleSAMLAuth` that reads in IdP data from a
+model (i.e. the database) rather than using the settings config dict
+`SOCIAL_AUTH_SAML_ENABLED_IDPS`.
 
-It is designed to be deployed to Heroku, although you could test locally
-with ngrok. You just need a (HTTPS) URL that the IdP can connect to.
+The reason for this is to make it easy to update / test new IdPs on a
+live environment without having to deploy. If you are running a platform
+that offers SSO to clients as a feature, having to embed their IdP
+details in the settings (which also requires a redeployment) isn't a
+practical option.
+
+The IdP data is input via the Django admin site.
+
+## Settings
+
+This package relies on the existing `python-social-auth` settings. See
+their documentation for details, or refer to the `demo.settings.base`
+module for an example.
 
 ## Configuration
 
@@ -24,20 +40,16 @@ Click this button to deploy to Heroku:
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-You must supply three SAML settings that should be available from your test
-IdP provider. If you have a Google Workspace account, that can be used - see
-https://admin.google.com/ac/security/ssocert for details.
-
-## Miscellaneous (tests, etc.)
-
-This app is designed to be deployed, not downloaded as a package - it's not on
-PyPI, it has no tests, or CI build.
+You must supply three SAML settings that should be available from your
+test IdP provider. If you have a Google Workspace account, that can be
+used - see https://admin.google.com/ac/security/ssocert for details.
 
 ## DISCLAIMER
 
-This app demonstrate SSO using SAML2.0, which means it's _destined_ (but not
-designed) to be used in security-conscious enterprise environments. It is a
-**demonstration** only - it should NOT BE TRUSTED, and you do so at YOUR OWN
-RISK.
+The demo app demonstrate SSO using SAML2.0, which means it's _destined_
+(but not designed) to be used in security-conscious enterprise
+environments. It is a **demonstration** only - it should NOT BE TRUSTED,
+and you do so at YOUR OWN RISK.
 
-**Do not deploy this in a secure environment, and do not connect it to a real IdP.**
+**Do not deploy the demo into a secure environment, and do not connect
+it to a real IdP.**
