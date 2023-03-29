@@ -1,15 +1,14 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpRequest, HttpResponse
-from django.urls import reverse
-from social_django.utils import load_backend, load_strategy
+
+from .metadata import MetadataException, get_saml_metadata
 
 
 @user_passes_test(lambda u: u.is_superuser)
 def saml_metadata_view(request: HttpRequest) -> HttpResponse:
     """View to generate the SAML metadata XML (superuser only)."""
-    uri = (reverse("social:complete", args=("saml",)),)
-    saml_backend = load_backend(load_strategy(request), "saml", redirect_uri=uri)
-    metadata, errors = saml_backend.generate_metadata_xml()
-    if not errors:
+    try:
+        metadata = get_saml_metadata(request)
         return HttpResponse(content=metadata, content_type="text/xml")
-    raise Exception("Error loading SAML backend.")
+    except MetadataException as ex:
+        raise Exception("Error generating metadata XML.") from ex

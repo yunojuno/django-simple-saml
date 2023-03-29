@@ -35,18 +35,6 @@
         "SAML_SP_ENTITY_ID": {
             "description": "The entity ID of the service provider.",
             "required": true
-        },
-        "SAML_IDP_ENTITY_ID": {
-            "description": "The entity ID of the identity provider.",
-            "required": true
-        },
-        "SAML_IDP_SSO_URL": {
-            "description": "The SSO URL of the identity provider.",
-            "required": true
-        },
-        "SAML_IDP_X509_CERT": {
-            "description": "The X.509 certificate of the identity provider.",
-            "required": true
         }
     },
     "formation": {
