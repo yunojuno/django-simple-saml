@@ -107,9 +107,7 @@ class IdentityProvider(models.Model):
         # only return non-empty values, as social_auth does not handle
         # empty values well.
         if not self.user_permanent_id_attr:
-            raise ValueError(
-                "IdentityProvider.user_permanent_id_attr is required"
-            )
+            raise ValueError("IdentityProvider.user_permanent_id_attr is required")
         return {
             k: v
             for k, v in {

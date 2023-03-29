@@ -7,12 +7,12 @@ repos:
 
   # python code formatting - will amend files
   - repo: https://github.com/ambv/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black
 
   - repo: https://github.com/rtts/djhtml
-    rev: main
+    rev: 3.0.6
     hooks:
     - id: djhtml
 
