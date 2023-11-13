@@ -4,7 +4,7 @@ Django app to manage SAML Identity Providers
 
 ## Version support
 
-This app support Django 4.1+ and Python 3.8+.
+This app support Django 3.2+ and Python 3.8+.
 
 ## Background
 
@@ -43,6 +43,11 @@ Click this button to deploy to Heroku:
 You must supply three SAML settings that should be available from your
 test IdP provider. If you have a Google Workspace account, that can be
 used - see https://admin.google.com/ac/security/ssocert for details.
+
+## Local install & setup
+
+If you are having problems installing `xmlsec` locally, try this:
+https://github.com/xmlsec/python-xmlsec/issues/254
 
 ## DISCLAIMER
 

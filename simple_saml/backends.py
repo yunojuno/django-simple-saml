@@ -1,7 +1,6 @@
 import logging
 
-from social_core.backends.saml import SAMLAuth as BaseSAMLAuth
-from social_core.backends.saml import SAMLIdentityProvider
+from social_core.backends.saml import SAMLAuth as BaseSAMLAuth, SAMLIdentityProvider
 
 from .models import IdentityProvider
 

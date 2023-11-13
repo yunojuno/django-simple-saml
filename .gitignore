@@ -1,6 +1,7 @@
 .coverage
 .env
 .tox
+.python-version
 .venv
 *.bak
 *.crt
@@ -9,4 +10,5 @@
 *.key
 *.lock
 *.pyc
+*.whl
 staticfiles
