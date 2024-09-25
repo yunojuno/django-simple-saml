@@ -43,18 +43,3 @@ Click this button to deploy to Heroku:
 You must supply three SAML settings that should be available from your
 test IdP provider. If you have a Google Workspace account, that can be
 used - see https://admin.google.com/ac/security/ssocert for details.
-
-## Local install & setup
-
-If you are having problems installing `xmlsec` locally, try this:
-https://github.com/xmlsec/python-xmlsec/issues/254
-
-## DISCLAIMER
-
-The demo app demonstrate SSO using SAML2.0, which means it's _destined_
-(but not designed) to be used in security-conscious enterprise
-environments. It is a **demonstration** only - it should NOT BE TRUSTED,
-and you do so at YOUR OWN RISK.
-
-**Do not deploy the demo into a secure environment, and do not connect
-it to a real IdP.**
