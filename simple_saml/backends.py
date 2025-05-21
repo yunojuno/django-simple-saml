@@ -20,14 +20,14 @@ class SimpleSAMLAuth(BaseSAMLAuth):
             raise ValueError(f"Identity provider {idp_name} is not enabled.")
         return SAMLIdentityProvider(idp_name, **idp.config)
 
-    def get_user_permanent_id(self, attributes: dict) -> str:
-        """Return the permanent user id from the attributes."""
+    def get_user_id(self, details: dict, response: dict) -> str:
+        """Return the permanent user id from the response."""
         try:
-            return super().get_user_permanent_id(attributes=attributes)
+            return super().get_user_id(details, response)
         except KeyError:
             logger.exception(
                 "Error getting user_permanent_id from response. "
-                "Check attributes for more details: %s",
-                attributes,
+                "Check response for more details: %s",
+                response,
             )
             raise
