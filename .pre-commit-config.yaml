@@ -5,11 +5,12 @@ repos:
     hooks:
       - id: black
 
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: "v0.1.5"
+    rev: "v0.3.0"
     hooks:
       - id: ruff
+        name: ruff check
         args: [--fix, --exit-non-zero-on-fix]
 
   # python static type checking
