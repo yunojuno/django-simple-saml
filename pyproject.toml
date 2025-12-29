@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-simple-saml"
-version = "0.3.0"
+version = "0.4.0"
 description = "Django app for managing multiple SAML Identity Providers."
 license = "MIT"
 authors = ["YunoJuno <code@yunojuno.com>"]
@@ -12,23 +12,19 @@ documentation = "https://github.com/yunojuno/django-simple-saml"
 classifiers = [
     "Environment :: Web Environment",
     "Framework :: Django",
-    "Framework :: Django :: 4.2",
-    "Framework :: Django :: 5.0",
     "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 packages = [{ include = "simple_saml" }]
 
 [tool.poetry.dependencies]
-python = "^3.8"
-django = "^4.2 | ^5.0 | ^5.2"
+python = "^3.12"
+django = ">=5.2,<7.0"
 social-auth-app-django = "*"
 python3-saml = "*"
 dj_database_url = { version = "*", optional=true}
