@@ -4,7 +4,7 @@ Django app to manage SAML Identity Providers
 
 ## Version support
 
-This app supports Django 4.2+ and Python 3.8+.
+This app supports Python 3.12+ and Django 5.2-6.0.
 
 ## Background
 
