@@ -1,5 +1,6 @@
 import pytest
 
+from simple_saml.exceptions import IdentityProviderConfigurationError
 from simple_saml.models import IdentityProvider
 
 
@@ -26,5 +27,5 @@ class TestIdentityProvider:
 
     def test_user_attr_map_empty(self) -> None:
         provider = IdentityProvider()
-        with pytest.raises(ValueError):
+        with pytest.raises(IdentityProviderConfigurationError):
             provider.user_attribute_map
