@@ -5,6 +5,8 @@ from typing import Any
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
+from .exceptions import IdentityProviderConfigurationError
+
 
 class IdentityProviderManager(models.Manager):
     """Custom manager for the IdentityProvider model."""
@@ -107,7 +109,10 @@ class IdentityProvider(models.Model):
         # only return non-empty values, as social_auth does not handle
         # empty values well.
         if not self.user_permanent_id_attr:
-            raise ValueError("IdentityProvider.user_permanent_id_attr is required")
+            raise IdentityProviderConfigurationError(
+                field_name="user_permanent_id_attr",
+                idp_name=self.label or None,
+            )
         return {
             k: v
             for k, v in {

@@ -4,13 +4,9 @@ from django.http import HttpRequest
 from django.urls import reverse
 from social_django.utils import load_backend, load_strategy
 
-from .exceptions import SamlException
+from .exceptions import MetadataException
 
 logger = logging.getLogger(__name__)
-
-
-class MetadataException(SamlException):
-    pass
 
 
 def get_saml_metadata(request: HttpRequest, redirect_uri: str = "") -> str:
@@ -21,7 +17,6 @@ def get_saml_metadata(request: HttpRequest, redirect_uri: str = "") -> str:
     metadata, errors = backend.generate_metadata_xml()
     if not errors:
         return metadata
-    # log specific errors, then raise a generic exception
-    # in case there is sensitive information in the errors
+    # Log specific backend errors while keeping the raised exception message generic.
     logger.error("Error loading SAML backend: %s", errors)
-    raise MetadataException("Error loading SAML backend.")
+    raise MetadataException(backend_errors=tuple(map(str, errors)))
