@@ -8,11 +8,18 @@ from .models import IdentityProvider
 
 
 class IdentityProviderForm(forms.ModelForm):
+    requested_authn_context_values = forms.JSONField(
+        required=False,
+        help_text=IdentityProvider._meta.get_field(
+            "requested_authn_context_values"
+        ).help_text,
+        widget=forms.Textarea(attrs={"rows": 4, "cols": 100}),
+    )
+
     class Meta:
         model = IdentityProvider
         fields = "__all__"
         widgets = {
-            "metadata": forms.Textarea(attrs={"rows": 10, "cols": 100}),
             "x509_cert": forms.Textarea(attrs={"rows": 10, "cols": 100}),
         }
 
@@ -53,6 +60,16 @@ class IdentityProviderAdmin(admin.ModelAdmin):
                     "last_name_attr",
                     "email_attr",
                     "username_attr",
+                ),
+            },
+        ),
+        (
+            "RequestedAuthnContext",
+            {
+                "fields": (
+                    "requested_authn_context_mode",
+                    "requested_authn_context_comparison",
+                    "requested_authn_context_values",
                 ),
             },
         ),

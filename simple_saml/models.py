@@ -1,11 +1,20 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal, TypedDict, cast
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _lazy
 
 from .exceptions import IdentityProviderConfigurationError
+
+RequestedAuthnContextComparisonValue = Literal["exact", "minimum", "maximum", "better"]
+RequestedAuthnContextValue = bool | list[str]
+
+
+class SamlSecurityConfig(TypedDict, total=False):
+    requestedAuthnContext: RequestedAuthnContextValue
+    requestedAuthnContextComparison: RequestedAuthnContextComparisonValue
 
 
 class IdentityProviderManager(models.Manager):
@@ -18,6 +27,17 @@ class IdentityProviderManager(models.Manager):
 
 class IdentityProvider(models.Model):
     """Class to store the Identity Provider metadata."""
+
+    class RequestedAuthnContextMode(models.TextChoices):
+        DISABLED = "DISABLED", _lazy("Disabled")
+        PASSWORD = "PASSWORD", _lazy("PasswordProtectedTransport")
+        CUSTOM = "CUSTOM", _lazy("Custom")
+
+    class RequestedAuthnContextComparison(models.TextChoices):
+        EXACT = "exact", _lazy("Exact")
+        MINIMUM = "minimum", _lazy("Minimum")
+        MAXIMUM = "maximum", _lazy("Maximum")
+        BETTER = "better", _lazy("Better")
 
     label = models.CharField(
         max_length=255,
@@ -88,6 +108,28 @@ class IdentityProvider(models.Model):
             "'user.username' property."
         ),
     )
+    requested_authn_context_mode = models.CharField(
+        max_length=16,
+        choices=RequestedAuthnContextMode.choices,
+        default=RequestedAuthnContextMode.DISABLED,
+        help_text=_lazy("How to populate the SAML RequestedAuthnContext for this IdP."),
+    )
+    requested_authn_context_values = models.JSONField(
+        blank=True,
+        default=list,
+        help_text=_lazy(
+            "Custom AuthnContextClassRef values for CUSTOM mode. "
+            "Ignored for DISABLED and PASSWORD."
+        ),
+    )
+    requested_authn_context_comparison = models.CharField(
+        max_length=8,
+        choices=RequestedAuthnContextComparison.choices,
+        default=RequestedAuthnContextComparison.EXACT,
+        help_text=_lazy(
+            "RequestedAuthnContext comparison value passed to python3-saml."
+        ),
+    )
     is_enabled = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -103,6 +145,19 @@ class IdentityProvider(models.Model):
         if "update_fields" in kwargs:
             kwargs["update_fields"] += ["updated_at"]
         return super().save(*args, **kwargs)
+
+    def clean(self) -> None:
+        super().clean()
+        if self.requested_authn_context_mode != self.RequestedAuthnContextMode.CUSTOM:
+            return
+        requested_authn_context_values, error_message = (
+            self._normalize_requested_authn_context_values()
+        )
+        if error_message is not None:
+            raise ValidationError(
+                {"requested_authn_context_values": error_message},
+            )
+        self.requested_authn_context_values = requested_authn_context_values
 
     @property
     def user_attribute_map(self) -> dict[str, str]:
@@ -133,6 +188,90 @@ class IdentityProvider(models.Model):
             "url": self.sso_url,
             "x509cert": self.x509_cert,
         } | self.user_attribute_map
+
+    @property
+    def security_config(self) -> SamlSecurityConfig:
+        mode = self.requested_authn_context_mode_value
+        if mode == self.RequestedAuthnContextMode.DISABLED:
+            return {"requestedAuthnContext": False}
+
+        comparison = self.requested_authn_context_comparison_value
+        if mode == self.RequestedAuthnContextMode.PASSWORD:
+            return {
+                "requestedAuthnContext": True,
+                "requestedAuthnContextComparison": comparison,
+            }
+
+        return {
+            "requestedAuthnContext": self.requested_authn_context_value_list,
+            "requestedAuthnContextComparison": comparison,
+        }
+
+    @property
+    def requested_authn_context_mode_value(self) -> str:
+        if (
+            self.requested_authn_context_mode
+            not in self.RequestedAuthnContextMode.values
+        ):
+            raise IdentityProviderConfigurationError(
+                field_name="requested_authn_context_mode",
+                idp_name=self.label or None,
+            )
+        return self.requested_authn_context_mode
+
+    @property
+    def requested_authn_context_comparison_value(
+        self,
+    ) -> RequestedAuthnContextComparisonValue:
+        if (
+            self.requested_authn_context_comparison
+            not in self.RequestedAuthnContextComparison.values
+        ):
+            raise IdentityProviderConfigurationError(
+                field_name="requested_authn_context_comparison",
+                idp_name=self.label or None,
+            )
+        return cast(
+            RequestedAuthnContextComparisonValue,
+            self.requested_authn_context_comparison,
+        )
+
+    @property
+    def requested_authn_context_value_list(self) -> list[str]:
+        requested_authn_context_values, error_message = (
+            self._normalize_requested_authn_context_values()
+        )
+        if error_message is not None:
+            raise IdentityProviderConfigurationError(
+                field_name="requested_authn_context_values",
+                idp_name=self.label or None,
+            )
+        return requested_authn_context_values
+
+    def _normalize_requested_authn_context_values(
+        self,
+    ) -> tuple[list[str], str | None]:
+        if not isinstance(self.requested_authn_context_values, list):
+            return [], "Enter a JSON array of authn context class refs."
+
+        requested_authn_context_values: list[str] = []
+        for value in self.requested_authn_context_values:
+            if not isinstance(value, str):
+                return [], "Each requested authn context value must be a string."
+            stripped_value = value.strip()
+            if not stripped_value:
+                return [], (
+                    "Each requested authn context value must be a non-empty string."
+                )
+            requested_authn_context_values.append(stripped_value)
+
+        if not requested_authn_context_values:
+            return (
+                [],
+                "Provide at least one requested authn context value for CUSTOM mode.",
+            )
+
+        return requested_authn_context_values, None
 
     def x509_cert_short(self) -> str:
         """Return truncated version of X.509 certificate."""

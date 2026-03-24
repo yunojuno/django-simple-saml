@@ -1,4 +1,5 @@
 import logging
+from typing import cast
 
 from social_core.backends.saml import SAMLAuth as BaseSAMLAuth, SAMLIdentityProvider
 
@@ -8,15 +9,30 @@ from .exceptions import (
     MissingIdentityProviderNameError,
     MissingUserPermanentIdError,
 )
-from .models import IdentityProvider
+from .models import IdentityProvider, SamlSecurityConfig
 
 logger = logging.getLogger(__name__)
+
+
+class SimpleSAMLIdentityProvider(SAMLIdentityProvider):
+    """SAML identity provider with package-specific security overrides."""
+
+    def __init__(
+        self,
+        backend: BaseSAMLAuth,
+        name: str,
+        *,
+        security_config: SamlSecurityConfig | None = None,
+        **kwargs: str,
+    ) -> None:
+        super().__init__(backend=backend, name=name, **kwargs)
+        self.security_config = security_config or {}
 
 
 class SimpleSAMLAuth(BaseSAMLAuth):
     """Subclass of SAMLAuth that stores the IdP info in a model."""
 
-    def get_idp(self, idp_name: str | None) -> SAMLIdentityProvider:
+    def get_idp(self, idp_name: str | None) -> SimpleSAMLIdentityProvider:
         if idp_name is None:
             raise MissingIdentityProviderNameError()
         try:
@@ -25,7 +41,21 @@ class SimpleSAMLAuth(BaseSAMLAuth):
             raise IdentityProviderNotFoundError(idp_name=idp_name) from ex
         if not idp.is_enabled:
             raise IdentityProviderDisabledError(idp_name=idp_name)
-        return SAMLIdentityProvider(backend=self, name=idp_name, **idp.config)
+        return SimpleSAMLIdentityProvider(
+            backend=self,
+            name=idp_name,
+            security_config=idp.security_config,
+            **idp.config,
+        )
+
+    def generate_saml_config(
+        self,
+        idp: SAMLIdentityProvider | None = None,
+    ) -> dict[str, object]:
+        config = cast(dict[str, object], super().generate_saml_config(idp))
+        if isinstance(idp, SimpleSAMLIdentityProvider):
+            cast(dict[str, object], config["security"]).update(idp.security_config)
+        return config
 
     def get_user_id(self, details: dict, response: dict) -> str:
         """Return the permanent user id from the response."""
