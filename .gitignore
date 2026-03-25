@@ -2,6 +2,7 @@
 .env
 .tox
 .python-version
+dist
 .venv
 *.bak
 *.crt
