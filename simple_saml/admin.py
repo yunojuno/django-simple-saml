@@ -8,19 +8,14 @@ from .models import IdentityProvider
 
 
 class IdentityProviderForm(forms.ModelForm):
-    requested_authn_context_values = forms.JSONField(
-        required=False,
-        help_text=IdentityProvider._meta.get_field(
-            "requested_authn_context_values"
-        ).help_text,
-        widget=forms.Textarea(attrs={"rows": 4, "cols": 100}),
-    )
-
     class Meta:
         model = IdentityProvider
         fields = "__all__"
         widgets = {
             "x509_cert": forms.Textarea(attrs={"rows": 10, "cols": 100}),
+            "requested_authn_context_values": forms.Textarea(
+                attrs={"rows": 4, "cols": 100}
+            ),
         }
 
 
@@ -96,9 +91,7 @@ class IdentityProviderAdmin(admin.ModelAdmin):
         form: IdentityProviderForm,
         change: bool,
     ) -> None:
-        """Validate that the metadata contains attr_user_permanent_id."""
-        # if "attr_user_permanent_id" not in obj.metadata:
-        #     raise forms.ValidationError("`attr_user_permanent_id` is a required key.")
+        """Reject labels that would break social-auth's IdP naming assumptions."""
         if ":" in obj.label:
             raise forms.ValidationError("`label` must not contain a colon.")
         if " " in obj.label:

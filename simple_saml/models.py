@@ -191,53 +191,28 @@ class IdentityProvider(models.Model):
 
     @property
     def security_config(self) -> SamlSecurityConfig:
-        mode = self.requested_authn_context_mode_value
+        mode = self._require_choice(
+            field_name="requested_authn_context_mode",
+            value=self.requested_authn_context_mode,
+            choices=self.RequestedAuthnContextMode,
+        )
         if mode == self.RequestedAuthnContextMode.DISABLED:
             return {"requestedAuthnContext": False}
 
-        comparison = self.requested_authn_context_comparison_value
+        comparison = cast(
+            RequestedAuthnContextComparisonValue,
+            self._require_choice(
+                field_name="requested_authn_context_comparison",
+                value=self.requested_authn_context_comparison,
+                choices=self.RequestedAuthnContextComparison,
+            ),
+        )
         if mode == self.RequestedAuthnContextMode.PASSWORD:
             return {
                 "requestedAuthnContext": True,
                 "requestedAuthnContextComparison": comparison,
             }
 
-        return {
-            "requestedAuthnContext": self.requested_authn_context_value_list,
-            "requestedAuthnContextComparison": comparison,
-        }
-
-    @property
-    def requested_authn_context_mode_value(self) -> str:
-        if (
-            self.requested_authn_context_mode
-            not in self.RequestedAuthnContextMode.values
-        ):
-            raise IdentityProviderConfigurationError(
-                field_name="requested_authn_context_mode",
-                idp_name=self.label or None,
-            )
-        return self.requested_authn_context_mode
-
-    @property
-    def requested_authn_context_comparison_value(
-        self,
-    ) -> RequestedAuthnContextComparisonValue:
-        if (
-            self.requested_authn_context_comparison
-            not in self.RequestedAuthnContextComparison.values
-        ):
-            raise IdentityProviderConfigurationError(
-                field_name="requested_authn_context_comparison",
-                idp_name=self.label or None,
-            )
-        return cast(
-            RequestedAuthnContextComparisonValue,
-            self.requested_authn_context_comparison,
-        )
-
-    @property
-    def requested_authn_context_value_list(self) -> list[str]:
         requested_authn_context_values, error_message = (
             self._normalize_requested_authn_context_values()
         )
@@ -246,7 +221,24 @@ class IdentityProvider(models.Model):
                 field_name="requested_authn_context_values",
                 idp_name=self.label or None,
             )
-        return requested_authn_context_values
+        return {
+            "requestedAuthnContext": requested_authn_context_values,
+            "requestedAuthnContextComparison": comparison,
+        }
+
+    def _require_choice(
+        self,
+        *,
+        field_name: str,
+        value: str,
+        choices: type[models.TextChoices],
+    ) -> str:
+        if value not in choices.values:
+            raise IdentityProviderConfigurationError(
+                field_name=field_name,
+                idp_name=self.label or None,
+            )
+        return value
 
     def _normalize_requested_authn_context_values(
         self,

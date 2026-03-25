@@ -92,6 +92,15 @@ def build_provider(**overrides: object) -> IdentityProvider:
     return provider
 
 
+def stub_provider_get(
+    monkeypatch: pytest.MonkeyPatch,
+    **provider_overrides: object,
+) -> IdentityProvider:
+    provider = build_provider(**provider_overrides)
+    monkeypatch.setattr(IdentityProvider.objects, "get", lambda **kwargs: provider)
+    return provider
+
+
 def decode_saml_request_from_url(url: str) -> str:
     query = parse_qs(urlparse(url).query)
     return OneLogin_Saml2_Utils.decode_base64_and_inflate(
@@ -174,9 +183,8 @@ class TestSimpleSAMLAuth:
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        provider = build_provider()
+        provider = stub_provider_get(monkeypatch)
         backend = build_backend()
-        monkeypatch.setattr(IdentityProvider.objects, "get", lambda **kwargs: provider)
 
         config = backend.generate_saml_config(backend.get_idp(provider.label))
 
@@ -187,7 +195,8 @@ class TestSimpleSAMLAuth:
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        provider = build_provider(
+        provider = stub_provider_get(
+            monkeypatch,
             requested_authn_context_mode=(
                 IdentityProvider.RequestedAuthnContextMode.PASSWORD
             ),
@@ -196,7 +205,6 @@ class TestSimpleSAMLAuth:
             ),
         )
         backend = build_backend()
-        monkeypatch.setattr(IdentityProvider.objects, "get", lambda **kwargs: provider)
 
         config = backend.generate_saml_config(backend.get_idp(provider.label))
 
@@ -207,7 +215,8 @@ class TestSimpleSAMLAuth:
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        provider = build_provider(
+        provider = stub_provider_get(
+            monkeypatch,
             requested_authn_context_mode=IdentityProvider.RequestedAuthnContextMode.CUSTOM,
             requested_authn_context_comparison=(
                 IdentityProvider.RequestedAuthnContextComparison.BETTER
@@ -215,7 +224,6 @@ class TestSimpleSAMLAuth:
             requested_authn_context_values=["urn:example:loa:2", "urn:example:loa:3"],
         )
         backend = build_backend()
-        monkeypatch.setattr(IdentityProvider.objects, "get", lambda **kwargs: provider)
 
         config = backend.generate_saml_config(backend.get_idp(provider.label))
 
@@ -229,11 +237,7 @@ class TestSimpleSAMLAuth:
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        monkeypatch.setattr(
-            IdentityProvider.objects,
-            "get",
-            lambda **kwargs: build_provider(),
-        )
+        stub_provider_get(monkeypatch)
         backend = build_backend()
 
         auth_url = backend.auth_url()
@@ -245,16 +249,13 @@ class TestSimpleSAMLAuth:
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        monkeypatch.setattr(
-            IdentityProvider.objects,
-            "get",
-            lambda **kwargs: build_provider(
-                requested_authn_context_mode=(
-                    IdentityProvider.RequestedAuthnContextMode.PASSWORD
-                ),
-                requested_authn_context_comparison=(
-                    IdentityProvider.RequestedAuthnContextComparison.EXACT
-                ),
+        stub_provider_get(
+            monkeypatch,
+            requested_authn_context_mode=(
+                IdentityProvider.RequestedAuthnContextMode.PASSWORD
+            ),
+            requested_authn_context_comparison=(
+                IdentityProvider.RequestedAuthnContextComparison.EXACT
             ),
         )
         backend = build_backend()
@@ -269,21 +270,18 @@ class TestSimpleSAMLAuth:
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        monkeypatch.setattr(
-            IdentityProvider.objects,
-            "get",
-            lambda **kwargs: build_provider(
-                requested_authn_context_mode=(
-                    IdentityProvider.RequestedAuthnContextMode.CUSTOM
-                ),
-                requested_authn_context_comparison=(
-                    IdentityProvider.RequestedAuthnContextComparison.MAXIMUM
-                ),
-                requested_authn_context_values=[
-                    "urn:example:loa:2",
-                    "urn:example:loa:3",
-                ],
+        stub_provider_get(
+            monkeypatch,
+            requested_authn_context_mode=(
+                IdentityProvider.RequestedAuthnContextMode.CUSTOM
             ),
+            requested_authn_context_comparison=(
+                IdentityProvider.RequestedAuthnContextComparison.MAXIMUM
+            ),
+            requested_authn_context_values=[
+                "urn:example:loa:2",
+                "urn:example:loa:3",
+            ],
         )
         backend = build_backend()
 
