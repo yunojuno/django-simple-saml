@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-simple-saml"
-version = "1.0.0"
+version = "2.0.0"
 description = "Django app for managing multiple SAML Identity Providers."
 license = "MIT"
 authors = ["YunoJuno <code@yunojuno.com>"]

@@ -2,6 +2,28 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.0] - 2026-03-25
+
+### Breaking changes
+
+- `RequestedAuthnContext` is no longer sent in SAML AuthnRequests by default. To preserve the previous behaviour, set `requested_authn_context_mode` to `PASSWORD` on each of your existing `IdentityProvider` records.
+
+### Added
+
+- Per-IdP `RequestedAuthnContext` configuration via three new fields on `IdentityProvider`:
+  - `requested_authn_context_mode` — choose between `DISABLED` (default), `PASSWORD` (PasswordProtectedTransport), or `CUSTOM` (arbitrary AuthnContextClassRef URIs).
+  - `requested_authn_context_values` — JSON list of custom AuthnContextClassRef values (used in `CUSTOM` mode).
+  - `requested_authn_context_comparison` — comparison operator (`exact`, `minimum`, `maximum`, `better`) passed to python3-saml.
+- `IdentityProvider.security_config` property that returns python3-saml-compatible security settings for the configured authn context.
+- `SimpleSAMLIdentityProvider` subclass of `SAMLIdentityProvider` that carries per-IdP security config.
+- `SimpleSAMLAuth.generate_saml_config()` override that merges IdP-level security settings into the SAML config.
+- Model-level validation (`clean()`) ensuring `CUSTOM` mode has at least one valid string value.
+- Admin UI section for managing RequestedAuthnContext settings.
+
+### Fixed
+
+- Tox environment names in GitHub Actions workflow.
+
 ## [1.0.0] - 2026-03-03
 
 ### Breaking changes
