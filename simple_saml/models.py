@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Literal, TypedDict, cast
+from typing import Any, Literal, TypedDict
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -191,54 +191,29 @@ class IdentityProvider(models.Model):
 
     @property
     def security_config(self) -> SamlSecurityConfig:
-        mode = self._require_choice(
-            field_name="requested_authn_context_mode",
-            value=self.requested_authn_context_mode,
-            choices=self.RequestedAuthnContextMode,
-        )
-        if mode == self.RequestedAuthnContextMode.DISABLED:
+        """Return python3-saml security settings for RequestedAuthnContext.
+
+        Merged into the SAML config by
+        ``SimpleSAMLAuth.generate_saml_config`` when building the
+        AuthnRequest.  Assumes field values have been validated by
+        ``clean()`` at save time.
+        """
+        if self.requested_authn_context_mode == self.RequestedAuthnContextMode.DISABLED:
             return {"requestedAuthnContext": False}
 
-        comparison = cast(
-            RequestedAuthnContextComparisonValue,
-            self._require_choice(
-                field_name="requested_authn_context_comparison",
-                value=self.requested_authn_context_comparison,
-                choices=self.RequestedAuthnContextComparison,
-            ).lower(),
+        comparison: RequestedAuthnContextComparisonValue = (
+            self.requested_authn_context_comparison.lower()  # type: ignore[assignment]
         )
-        if mode == self.RequestedAuthnContextMode.PASSWORD:
+        if self.requested_authn_context_mode == self.RequestedAuthnContextMode.PASSWORD:
             return {
                 "requestedAuthnContext": True,
                 "requestedAuthnContextComparison": comparison,
             }
 
-        requested_authn_context_values, error_message = (
-            self._normalize_requested_authn_context_values()
-        )
-        if error_message is not None:
-            raise IdentityProviderConfigurationError(
-                field_name="requested_authn_context_values",
-                idp_name=self.label or None,
-            )
         return {
-            "requestedAuthnContext": requested_authn_context_values,
+            "requestedAuthnContext": self.requested_authn_context_values,
             "requestedAuthnContextComparison": comparison,
         }
-
-    def _require_choice(
-        self,
-        *,
-        field_name: str,
-        value: str,
-        choices: type[models.TextChoices],
-    ) -> str:
-        if value not in choices.values:
-            raise IdentityProviderConfigurationError(
-                field_name=field_name,
-                idp_name=self.label or None,
-            )
-        return value
 
     def _normalize_requested_authn_context_values(
         self,
