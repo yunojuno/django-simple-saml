@@ -12,8 +12,10 @@ class IdentityProviderForm(forms.ModelForm):
         model = IdentityProvider
         fields = "__all__"
         widgets = {
-            "metadata": forms.Textarea(attrs={"rows": 10, "cols": 100}),
             "x509_cert": forms.Textarea(attrs={"rows": 10, "cols": 100}),
+            "requested_authn_context_values": forms.Textarea(
+                attrs={"rows": 4, "cols": 100}
+            ),
         }
 
 
@@ -56,6 +58,16 @@ class IdentityProviderAdmin(admin.ModelAdmin):
                 ),
             },
         ),
+        (
+            "RequestedAuthnContext",
+            {
+                "fields": (
+                    "requested_authn_context_mode",
+                    "requested_authn_context_comparison",
+                    "requested_authn_context_values",
+                ),
+            },
+        ),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     )
 
@@ -79,9 +91,7 @@ class IdentityProviderAdmin(admin.ModelAdmin):
         form: IdentityProviderForm,
         change: bool,
     ) -> None:
-        """Validate that the metadata contains attr_user_permanent_id."""
-        # if "attr_user_permanent_id" not in obj.metadata:
-        #     raise forms.ValidationError("`attr_user_permanent_id` is a required key.")
+        """Reject labels that would break social-auth's IdP naming assumptions."""
         if ":" in obj.label:
             raise forms.ValidationError("`label` must not contain a colon.")
         if " " in obj.label:
