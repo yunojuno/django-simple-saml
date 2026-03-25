@@ -17,16 +17,6 @@ class SamlSecurityConfig(TypedDict, total=False):
     requestedAuthnContextComparison: RequestedAuthnContextComparisonValue
 
 
-REQUESTED_AUTHN_CONTEXT_COMPARISON_MAP: dict[
-    str, RequestedAuthnContextComparisonValue
-] = {
-    "EXACT": "exact",
-    "MINIMUM": "minimum",
-    "MAXIMUM": "maximum",
-    "BETTER": "better",
-}
-
-
 class IdentityProviderManager(models.Manager):
     """Custom manager for the IdentityProvider model."""
 
@@ -211,13 +201,11 @@ class IdentityProvider(models.Model):
 
         comparison = cast(
             RequestedAuthnContextComparisonValue,
-            REQUESTED_AUTHN_CONTEXT_COMPARISON_MAP[
-                self._require_choice(
-                    field_name="requested_authn_context_comparison",
-                    value=self.requested_authn_context_comparison,
-                    choices=self.RequestedAuthnContextComparison,
-                )
-            ],
+            self._require_choice(
+                field_name="requested_authn_context_comparison",
+                value=self.requested_authn_context_comparison,
+                choices=self.RequestedAuthnContextComparison,
+            ).lower(),
         )
         if mode == self.RequestedAuthnContextMode.PASSWORD:
             return {

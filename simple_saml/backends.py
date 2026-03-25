@@ -1,5 +1,5 @@
 import logging
-from typing import cast
+from typing import Any, cast
 
 from social_core.backends.saml import SAMLAuth as BaseSAMLAuth, SAMLIdentityProvider
 
@@ -23,7 +23,7 @@ class SimpleSAMLIdentityProvider(SAMLIdentityProvider):
         name: str,
         *,
         security_config: SamlSecurityConfig | None = None,
-        **kwargs: str,
+        **kwargs: Any,
     ) -> None:
         super().__init__(backend=backend, name=name, **kwargs)
         self.security_config = security_config or {}
