@@ -17,6 +17,16 @@ class SamlSecurityConfig(TypedDict, total=False):
     requestedAuthnContextComparison: RequestedAuthnContextComparisonValue
 
 
+REQUESTED_AUTHN_CONTEXT_COMPARISON_MAP: dict[
+    str, RequestedAuthnContextComparisonValue
+] = {
+    "EXACT": "exact",
+    "MINIMUM": "minimum",
+    "MAXIMUM": "maximum",
+    "BETTER": "better",
+}
+
+
 class IdentityProviderManager(models.Manager):
     """Custom manager for the IdentityProvider model."""
 
@@ -34,10 +44,10 @@ class IdentityProvider(models.Model):
         CUSTOM = "CUSTOM", _lazy("Custom")
 
     class RequestedAuthnContextComparison(models.TextChoices):
-        EXACT = "exact", _lazy("Exact")
-        MINIMUM = "minimum", _lazy("Minimum")
-        MAXIMUM = "maximum", _lazy("Maximum")
-        BETTER = "better", _lazy("Better")
+        EXACT = "EXACT", _lazy("Exact")
+        MINIMUM = "MINIMUM", _lazy("Minimum")
+        MAXIMUM = "MAXIMUM", _lazy("Maximum")
+        BETTER = "BETTER", _lazy("Better")
 
     label = models.CharField(
         max_length=255,
@@ -201,11 +211,13 @@ class IdentityProvider(models.Model):
 
         comparison = cast(
             RequestedAuthnContextComparisonValue,
-            self._require_choice(
-                field_name="requested_authn_context_comparison",
-                value=self.requested_authn_context_comparison,
-                choices=self.RequestedAuthnContextComparison,
-            ),
+            REQUESTED_AUTHN_CONTEXT_COMPARISON_MAP[
+                self._require_choice(
+                    field_name="requested_authn_context_comparison",
+                    value=self.requested_authn_context_comparison,
+                    choices=self.RequestedAuthnContextComparison,
+                )
+            ],
         )
         if mode == self.RequestedAuthnContextMode.PASSWORD:
             return {

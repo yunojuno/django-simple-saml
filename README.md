@@ -112,12 +112,20 @@ Equivalent `python3-saml` security config:
 
 ### Supported comparison values
 
-`requested_authn_context_comparison` supports:
+`requested_authn_context_comparison` is stored in the database as one of:
 
-- `exact`
-- `minimum`
-- `maximum`
-- `better`
+- `EXACT`
+- `MINIMUM`
+- `MAXIMUM`
+- `BETTER`
+
+Those values are mapped to the lowercase `python3-saml` equivalents when
+building the outbound SAML security config:
+
+- `EXACT` -> `exact`
+- `MINIMUM` -> `minimum`
+- `MAXIMUM` -> `maximum`
+- `BETTER` -> `better`
 
 ### Example
 

@@ -56,6 +56,14 @@ class TestIdentityProvider:
             "requestedAuthnContextComparison": "minimum",
         }
 
+    def test_requested_authn_context_comparison_values_are_uppercase_in_storage(
+        self,
+    ) -> None:
+        assert IdentityProvider.RequestedAuthnContextComparison.EXACT == "EXACT"
+        assert IdentityProvider.RequestedAuthnContextComparison.MINIMUM == "MINIMUM"
+        assert IdentityProvider.RequestedAuthnContextComparison.MAXIMUM == "MAXIMUM"
+        assert IdentityProvider.RequestedAuthnContextComparison.BETTER == "BETTER"
+
     def test_security_config_custom_mode(self) -> None:
         provider = IdentityProvider(
             requested_authn_context_mode=IdentityProvider.RequestedAuthnContextMode.CUSTOM,

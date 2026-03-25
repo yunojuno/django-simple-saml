@@ -15,12 +15,12 @@ class Migration(migrations.Migration):
             name="requested_authn_context_comparison",
             field=models.CharField(
                 choices=[
-                    ("exact", "Exact"),
-                    ("minimum", "Minimum"),
-                    ("maximum", "Maximum"),
-                    ("better", "Better"),
+                    ("EXACT", "Exact"),
+                    ("MINIMUM", "Minimum"),
+                    ("MAXIMUM", "Maximum"),
+                    ("BETTER", "Better"),
                 ],
-                default="exact",
+                default="EXACT",
                 help_text="RequestedAuthnContext comparison value passed to python3-saml.",
                 max_length=8,
             ),
