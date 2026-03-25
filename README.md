@@ -119,13 +119,7 @@ Equivalent `python3-saml` security config:
 - `MAXIMUM`
 - `BETTER`
 
-Those values are mapped to the lowercase `python3-saml` equivalents when
-building the outbound SAML security config:
-
-- `EXACT` -> `exact`
-- `MINIMUM` -> `minimum`
-- `MAXIMUM` -> `maximum`
-- `BETTER` -> `better`
+Those values are mapped to the lowercase `python3-saml` equivalents.
 
 ### Example
 
